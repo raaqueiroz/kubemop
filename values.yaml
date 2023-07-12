@@ -1,0 +1,110 @@
+# Global labels that will apply to all resources that will be provisioned
+labels: {}
+
+# Global annotations that will apply to all resources that will be provisioned
+annotations: {}
+
+# Settings to apply to CronJob Kind context
+cronJob:
+
+  # Cron expression with 5 columns to set how often the kubemop will run, default value: "3 */3 * * *".
+  # Default value means run every 3 hours always at minute three.
+
+  # ┌───────────── minute (0 - 59)
+  # │ ┌───────────── hour (0 - 23)
+  # │ │ ┌───────────── day of the month (1 - 31)
+  # │ │ │ ┌───────────── month (1 - 12)
+  # │ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday;
+  # │ │ │ │ │                                   7 is also Sunday on some systems)
+  # │ │ │ │ │                                   OR sun, mon, tue, wed, thu, fri, sat
+  # │ │ │ │ │
+  # * * * * *
+  
+  # Some examples:
+  # One time per day (03:17): "17 3 * * *"
+  # One time per week (Mon 03:17): "17 3 * * mon"
+  # Every 15 minutes every Monday only: "*/15 * * * mon"
+  # Every 2 hours in alternated days: "0 */2 */2 * *"
+
+  cronExpression: ~
+
+  # Define if job can run concurrently. Default value is: Forbid
+  concurrencyPolicy: ~
+
+  # These fields specify how many completed and failed jobs should be kept. Default value is 1 for both
+  successfulJobsHistoryLimit: ~  
+  failedJobsHistoryLimit: ~
+  
+  # You can suspend execution of Jobs for a CronJob, by setting the optional suspend field to true. The field defaults to false
+  suspend: ~
+  
+  # List of namespaces that you want to bypass and do nothing. By default the namespace kube-system will be ignored
+  excludedNamespaces: []
+    # - kube-system
+  
+  # Additional List of POD Statuses you want to delete. By default all statuses below will be deleted as well
+  additionalPodStatuses: []
+    # - Error
+    # - Evicted
+    # - ContainerStatusUnknown
+    # - NotReady
+    # - OOMKilled
+    # - Completed
+    # - Terminating
+    # - ImagePullBackOff
+    # - ErrImagePull
+  
+
+  # Labels and Annotations to be set on CronJob context
+  labels: {}
+  annotations: {}
+
+# Settings to apply to JobTemplate context
+jobTemplate:
+
+  # Define if POD can restart after an error occured. Default value is Never
+  restartPolicy: ~
+
+  # TTL controller cleans up the Job, it will delete the Job cascadingly, i.e. delete its dependent objects, such as Pods, together with the Job.
+  # Default value is 5
+  ttlSecondsAfterFinished: ~
+
+  # Time in seconds to wait to delete container after job completed. Default value is 30
+  terminationGracePeriodSeconds: ~
+  
+  # POD resources setup
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+
+  # Labels and Annotations to be set on JobTemplate context
+  labels: {}
+  annotations: {}
+  
+  # Labels and Annotations to be set on PODs
+  podLabels: {}
+  podAnnotations: {}
+
+# Labels and Annotations to be set on ServiceAccount Kind Resource only
+serviceAccount:
+  annotations: {}
+  labels: {}
+
+# Labels and Annotations to be set on ConfigMap Kind Resource only
+configMap:
+  annotations: {}
+  labels: {}
+
+# Labels and Annotations to be set on ClusterRole Kind Resource only
+clusterRole:
+  annotations: {}
+  labels: {}
+
+# Labels and Annotations to be set on ClusterRoleBinding Kind Resource only
+clusterRoleBinding:
+  annotations: {}
+  labels: {}

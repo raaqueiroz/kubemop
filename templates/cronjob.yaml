@@ -1,0 +1,94 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    {{- if .Values.cronJob.labels }}
+      {{- toYaml .Values.cronJob.labels | nindent 4 }}
+    {{- end }}
+    {{- if .Values.labels }}
+      {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.cronJob.annotations .Values.annotations }}
+  annotations:
+    {{- if .Values.cronJob.annotations }}
+      {{- toYaml .Values.cronJob.annotations | nindent 4 }}
+    {{- end }}
+    {{- if .Values.annotations }}
+      {{- toYaml .Values.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  concurrencyPolicy: {{ default "Forbid" .Values.cronJob.concurrencyPolicy }}
+  failedJobsHistoryLimit: {{ default 1 .Values.cronJob.failedJobsHistoryLimit }}
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+      name: {{ .Release.Name }}
+      labels:
+        app: {{ .Release.Name }}
+        {{- if .Values.jobTemplate.labels }}
+          {{- toYaml .Values.jobTemplate.labels | nindent 8 }}
+        {{- end }}
+        {{- if .Values.labels }}
+          {{- toYaml .Values.labels | nindent 8 }}
+        {{- end }}
+      {{- if or .Values.jobTemplate.annotations .Values.annotations }}
+      annotations:
+        {{- if .Values.jobTemplate.annotations }}
+          {{- toYaml .Values.jobTemplate.annotations | nindent 8 }}
+        {{- end }}
+        {{- if .Values.annotations }}
+          {{- toYaml .Values.annotations | nindent 8 }}
+        {{- end }}
+      {{- end }}
+    spec:
+      ttlSecondsAfterFinished: {{ default 5 .Values.jobTemplate.ttlSecondsAfterFinished }}
+      template:
+        metadata:
+          labels:
+            app: {{ .Release.Name }}
+            {{- if .Values.jobTemplate.podLabels }}
+              {{- toYaml .Values.jobTemplate.podLabels | nindent 12 }}
+            {{- end }}
+            {{- if .Values.labels }}
+              {{- toYaml .Values.labels | nindent 12 }}
+            {{- end }}
+          annotations:
+            sidecar.istio.io/inject: "false"
+            {{- if .Values.jobTemplate.podAnnotations }}
+              {{- toYaml .Values.jobTemplate.podAnnotations | nindent 12 }}
+            {{- end }}
+            {{- if .Values.annotations }}
+              {{- toYaml .Values.annotations | nindent 12 }}
+            {{- end }}
+          creationTimestamp: null
+        spec:
+          containers:
+          - command:
+            - /script/kubemop.sh
+            image: ubuntu:22.04
+            imagePullPolicy: IfNotPresent
+            name: {{ .Release.Name }}
+            resources: {{- toYaml .Values.jobTemplate.resources | nindent 14 }}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /script
+              name: script
+          dnsPolicy: ClusterFirst
+          serviceAccount: {{ .Release.Name }}
+          serviceAccountName: {{ .Release.Name }}
+          volumes:
+          - configMap:
+              defaultMode: 320
+              name: {{ .Release.Name }}
+            name: script
+          restartPolicy: {{ default "Never" .Values.jobTemplate.restartPolicy }}
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: {{ default 30 .Values.jobTemplate.terminationGracePeriodSeconds }}
+  schedule: {{ default "3 */3 * * *" .Values.cronJob.cronExpression | quote }}
+  successfulJobsHistoryLimit: {{ default 1 .Values.cronJob.successfulJobsHistoryLimit }}
+  suspend: {{ default false .Values.cronJob.suspend }}

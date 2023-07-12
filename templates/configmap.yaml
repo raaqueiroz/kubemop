@@ -1,0 +1,39 @@
+apiVersion: v1
+data:
+  kubemop.sh: |
+    #!/bin/bash
+
+    apt update
+    apt install curl -y
+    curl -L --output /bin/kubectl --url "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    chmod 755 /bin/kubectl
+
+    NS=$(kubectl get namespace | grep -vE "NAME|{{ join "|" .Values.cronJob.excludedNamespaces | default "kube-system" }}" | awk '{ print $1 }')
+
+    for ns in $NS; do
+        PODS=$(kubectl -n $ns get pods | grep -E "Error|Evicted|ContainerStatusUnknown|NotReady|OOMKilled|Completed|Terminating|ImagePullBackOff|ErrImagePull|{{ join "|" .Values.cronJob.additionalPodStatuses | default "Error" }}" | grep -vE NAME | awk '{ print $1 }' | wc -l)
+        if [[ $PODS -gt 0 ]]
+        then
+            kubectl -n $ns delete pods $(kubectl -n $ns get pods | grep -E "Error|Evicted|ContainerStatusUnknown|NotReady|OOMKilled|Completed|Terminating|ImagePullBackOff|ErrImagePull|{{ join "|" .Values.cronJob.additionalPodStatuses | default "Error" }}" | grep -vE NAME | awk '{ print $1 }')
+        fi
+    done
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    {{- if .Values.labels }}
+      {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
+    {{- if .Values.configMap.labels }}
+      {{- toYaml .Values.configMap.labels | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.configMap.annotations .Values.annotations }}
+  annotations:
+    {{- if .Values.configMap.annotations }}
+      {{- toYaml .Values.configMap.annotations | nindent 4 }}
+    {{- end }}
+    {{- if .Values.annotations }}
+      {{- toYaml .Values.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}

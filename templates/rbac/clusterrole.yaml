@@ -1,0 +1,40 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    namespace: {{ .Release.Namespace }}
+    {{- if .Values.labels }}
+      {{- toYaml .Values.labels | nindent 4 }}
+    {{- end }}
+    {{- if .Values.clusterRole.labels }}
+      {{- toYaml .Values.clusterRole.labels | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.clusterRole.annotations .Values.annotations }}
+  annotations:
+    {{- if .Values.clusterRole.annotations }}
+      {{- toYaml .Values.clusterRole.annotations | nindent 4 }}
+    {{- end }}
+    {{- if .Values.annotations }}
+      {{- toYaml .Values.annotations | nindent 4 }}
+    {{- end }}
+  {{- end }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
