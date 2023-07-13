@@ -81,6 +81,13 @@ jobTemplate:
       cpu: 300m
       memory: 256Mi
 
+  # Environment variables to set on POD
+  env: []
+
+  # NodeSelector and Tolerations to schedule POD in specific node
+  nodeSelector: {}
+  tolerations: []
+
   # Labels and Annotations to be set on JobTemplate context
   labels: {}
   annotations: {}
