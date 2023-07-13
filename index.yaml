@@ -3,13 +3,13 @@ entries:
   kubemop:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-07-13T11:14:27.417506-03:00"
+    created: "2023-07-13T15:33:37.427615-03:00"
     description: A Helm chart for Kubernetes to provision a CronJob and RBAC to clean
       PODs with specific Statuses
-    digest: 511856c932818ae9a4898eb691629ccc38723402847ebd87053a5e9de107e99b
+    digest: 5dae266e3802f6a5f6d608a7862a3a56a1a5ab4d79a3d9890ecaad97dc28905e
     name: kubemop
     type: application
     urls:
-    - https://raaqueiroz.github.io/kubemop/kubemop-0.3.0.tgz
-    version: 0.3.0
-generated: "2023-07-13T11:14:27.416799-03:00"
+    - https://raaqueiroz.github.io/kubemop/kubemop-0.3.1.tgz
+    version: 0.3.1
+generated: "2023-07-13T15:33:37.426448-03:00"
