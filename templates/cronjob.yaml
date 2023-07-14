@@ -49,6 +49,7 @@ spec:
         metadata:
           labels:
             app: {{ .Release.Name }}
+            sidecar.istio.io/inject: "false"
             {{- if .Values.jobTemplate.podLabels }}
               {{- toYaml .Values.jobTemplate.podLabels | nindent 12 }}
             {{- end }}
@@ -69,6 +70,7 @@ spec:
           - command:
             - /script/kubemop.sh
             image: ubuntu:22.04
+            env: {{- toYaml .Values.jobTemplate.env | nindent 14 }}
             imagePullPolicy: IfNotPresent
             name: {{ .Release.Name }}
             resources: {{- toYaml .Values.jobTemplate.resources | nindent 14 }}
@@ -80,6 +82,12 @@ spec:
           dnsPolicy: ClusterFirst
           serviceAccount: {{ .Release.Name }}
           serviceAccountName: {{ .Release.Name }}
+          nodeSelector:
+            kubernetes.io/os: linux
+            {{- if .Values.jobTemplate.nodeSelector }}
+              {{- toYaml .Values.jobTemplate.nodeSelector | nindent 12 }}
+            {{- end }}
+          tolerations: {{- toYaml .Values.jobTemplate.tolerations | nindent 12 }}
           volumes:
           - configMap:
               defaultMode: 320
