@@ -71,11 +71,6 @@ jobTemplate:
 
   # Time in seconds to wait to delete container after job completed. Default value is 30
   terminationGracePeriodSeconds: ~
-
-  # Set CPU Architecture node
-  # Accepted values: amd64 or arm64
-  # Default value is amd64
-  architecture: ~
   
   # POD resources setup
   resources:
