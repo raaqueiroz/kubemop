@@ -5,7 +5,16 @@ data:
 
     apt update
     apt install curl -y
-    curl -L --output /bin/kubectl --url "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/{{ join "|" .Values.jobTemplate.architecture | default "amd64" }}/kubectl"
+
+    ARCH=$(arch)
+
+    if [ $ARCH == "x86_64" ]; then
+      ARCH=amd64
+    else
+      ARCH=arm64
+    fi
+
+    curl -L --output /bin/kubectl --url "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$ARCH/kubectl"
     chmod 755 /bin/kubectl
 
     NS=$(kubectl get namespace | grep -vE "NAME|{{ join "|" .Values.cronJob.excludedNamespaces | default "kube-system" }}" | awk '{ print $1 }')
