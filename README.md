@@ -1,23 +1,19 @@
 # Kubemop
 A Helm chart for Kubernetes to provision a CronJob and RBAC to clean PODs with specific Statuses
 
-## Referências
-- https://github.com/raaqueiroz/kubemop
-
-## Instalação
+## Installation
 
 ```sh
 helm repo add kubemop https://raaqueiroz.github.io/kubemop/
-helm install kubemop kubemop/kubemop -f values.yaml -n kube-system
+helm install kubemop kubemop/kubemop -n kube-system
 ```
 
-## Customizações do values.yaml
+## Customizations
 
-| Parâmetro  | Valor default | Valor custom | Motivo |
+| Parameter  | Default value | Sample custom | Description |
 |------------|---------------|--------------|--------|
-| `cronJob.cronExpression` | `"3 */3 * * *"` | `"5 */3 * * *"` | Alterado o minuto para executar a limpeza após a execução de outros PODs e jobs do cluster |
-| `cronJob.excludedNamespaces` | `[]` | `["kube-system", "istio-system"]` | Adicionada namespaces para bypass e não efetuar nenhuma ação de exclusão |
-| `jobTemplate.env` | `[]` | `["DD_AGENT_HOST", "DD_ENV", "DD_SERVICE", "DD_VERSION"]` | Variáveis padrão para uso do Datadog |
-| `jobTemplate.nodeSelector` | `{}` | `true` | Habilitar a coleta de logs dos containers |
-| `jobTemplate.tolerations` | `[]` | `[ { "key": "CriticalAddonsOnly", "operator": "Exists" } ]` | Toleration para permitir que o POD seja executado no node com taint de addons |
-| `jobTemplate.podLabels` | `{}` | `{ "tags.datadoghq.com/env": "qa", "tags.datadoghq.com/service": "kubemop", "tags.datadoghq.com/version": 0.3.0 }` | Annotations padrão para uso do Datadog |
+| `cronJob.cronExpression` | `"3 */3 * * *"` | `"5 4 */2 * *"` | Define recurrency of kubemop runs |
+| `cronJob.excludedNamespaces` | `[]` | `["kube-system", "istio-system"]` | List of namespaces you want to exclude from cleanup |
+| `cronJob.additionalPodStatuses` | `["Error", "Evicted", "ContainerStatusUnknown", "NotReady", "OOMKilled", "Completed", "Terminating", "ImagePullBackOff", "ErrImagePull"]` | `["CrashLoopBackOff"]` | Additional statuses you want to append to default list |
+| `jobTemplate.nodeSelector` | `{}` | `{ "CriticalAddonsOnly": "true" }` | Node selector to look up for specific node |
+| `jobTemplate.tolerations` | `[]` | `[ { "key": "CriticalAddonsOnly", "operator": "Exists" } ]` | Toleration to allow scale POD in specific work node |
